@@ -48,8 +48,11 @@ hackbgrt_parse_param (const char* param, const char* esp_path, hackbgrt_config_t
   grub_dprintf("hackbgrt", "HackBGRT: param '%s' will be parsed\n", param);
   grub_errno = GRUB_ERR_NONE;
   char* param_dup = grub_strdup (param);
+
   char** var_values = hackbgrt_strsplit (param_dup, ',');
-  for (char** var_value_p = var_values; *var_value_p != NULL; var_value_p += sizeof (char*))
+  if (var_values == NULL) goto fail;
+
+  for (char** var_value_p = var_values; *var_value_p != NULL; var_value_p += 1)
   {
     char* var_value = *var_value_p;
     if (grub_strlen (var_value) == 0)
@@ -61,6 +64,7 @@ hackbgrt_parse_param (const char* param, const char* esp_path, hackbgrt_config_t
       grub_error (GRUB_ERR_READ_ERROR, "No variable=value defined in parameter: %s", var_value);
       break;
     }
+
     if (grub_strcmp(var, "image") == 0 && !image_path)
       image_path = value;
     else if (grub_strcmp(var, "x") == 0 && !image_x_str)
@@ -129,6 +133,10 @@ hackbgrt_strsplit (char* s, const char separator)
     if (*c == separator)
       count++;
   ret = (char**) grub_malloc (sizeof (char*) * count);
+  if (ret == NULL) {
+    grub_error(GRUB_ERR_READ_ERROR, "hackbgrt: error initializing strsplit");
+    return NULL;
+  }
   char** elem_p = ret;
   for (char* part = s; part;)
   {
@@ -136,10 +144,11 @@ hackbgrt_strsplit (char* s, const char separator)
     if (elem)
     {
       *elem_p = elem;
-      elem_p += sizeof (char*);
+      elem_p += 1;
     }
   }
   *elem_p = NULL;
+
   return ret;
 }
 
@@ -150,7 +159,7 @@ hackbgrt_strsep (char** stringp, const char separator)
   if (begin == NULL)
     return NULL;
   char* end = grub_strchr (begin, separator);
-  if (*end)
+  if (end && *end)
   {
     *end++ = '\0';
     *stringp = end;
