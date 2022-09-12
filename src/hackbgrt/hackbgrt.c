@@ -257,7 +257,7 @@ static bitmap_t load_bmp(const char* path)
     if (status)
     {
       grub_error(GRUB_ERR_READ_ERROR, "HackBGRT: Failed to allocate a blank BMP!\n");
-      grub_efi_system_table->boot_services->stall(1000000); // 1 sec pause
+      grub_efi_stall(1000000);  // 1 sec pause
     }
     else
     {
@@ -289,18 +289,17 @@ static bitmap_t load_bmp(const char* path)
     file = grub_file_open(path, GRUB_FILE_TYPE_PIXMAP);
     if (!file)
     {
-      grub_error(GRUB_ERR_READ_ERROR, "HackBGRT: Failed to load BMP (%s)!\n", path);
-      grub_efi_system_table->boot_services->stall(1000000); // 1 sec pause
+      grub_error(GRUB_ERR_READ_ERROR, "HackBGRT: Failed to load BMP (%s)!", path);
+      grub_efi_stall(1000000);  // 1 sec pause
     }
     else
     {
       struct bitmap_header header;
-      grub_dprintf ("hackbgrt", "file %s opened\n", path);
       if (grub_file_read (file, &header, sizeof (header)) != sizeof (header))
       {
         grub_file_close(file);
         grub_error(GRUB_ERR_READ_ERROR, "HackBGRT: Failed to load BMP (%s)!\n", path);
-        grub_efi_system_table->boot_services->stall(1000000); // 1 sec pause
+        grub_efi_stall(1000000);  // 1 sec pause
       }
       else
       {
@@ -326,7 +325,7 @@ static bitmap_t load_bmp(const char* path)
         {
           grub_file_close(file);
           grub_error(GRUB_ERR_READ_ERROR, "HackBGRT: Failed to load BMP, not supported format (%s)!\n", path);
-          grub_efi_system_table->boot_services->stall(1000000); // 1 sec pause
+          grub_efi_stall(1000000);  // 1 sec pause
         }
         else
         {
@@ -336,7 +335,7 @@ static bitmap_t load_bmp(const char* path)
           {
             grub_file_close(file);
             grub_error(GRUB_ERR_READ_ERROR, "HackBGRT: Failed to allocate memory for BMP!\n");
-            grub_efi_system_table->boot_services->stall(1000000); // 1 sec pause
+            grub_efi_stall(1000000);  // 1 sec pause
           }
           else
           {
@@ -348,7 +347,7 @@ static bitmap_t load_bmp(const char* path)
             {
               grub_file_close(file);
               grub_error(GRUB_ERR_READ_ERROR, "HackBGRT: Failed to load BMP (%s)!\n", path);
-              grub_efi_system_table->boot_services->stall(1000000); // 1 sec pause
+              grub_efi_stall(1000000);  // 1 sec pause
             }
             else
             {
