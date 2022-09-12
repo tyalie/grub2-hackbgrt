@@ -1,5 +1,5 @@
 #pragma once
-
+#include <grub/types.h>
 /**
  * Possible actions to perform on the BGRT.
  */
